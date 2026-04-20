@@ -63,3 +63,4 @@ components/
 - Integrate pdf-lib or PDF.js for real processing
 - Add WebAssembly workers for heavy operations
 - Add analytics, SEO metadata per tool
+# pdf
