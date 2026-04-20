@@ -33,6 +33,20 @@ export default function ToolPage({
     setDone(true);
   };
 
+  const handleDownload = () => {
+    if (files.length === 0) return;
+    // For demo: download the first file (in real app, this would be processed output)
+    const file = files[0];
+    const url = URL.createObjectURL(file);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `processed-${file.name}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="container-narrow py-10">
       <div className="max-w-3xl mx-auto">
@@ -80,7 +94,7 @@ export default function ToolPage({
                   <p className="font-medium text-emerald-900 dark:text-emerald-100">Your file is ready</p>
                   <p className="text-sm text-emerald-700 dark:text-emerald-300">Processed locally — no upload</p>
                 </div>
-                <button className="btn-secondary">
+                <button className="btn-secondary" onClick={handleDownload}>
                   <Download className="h-4 w-4 mr-2" />
                   Download
                 </button>
