@@ -95,6 +95,53 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* Comparison */}
+      <section className="container-narrow py-16">
+        <h2 className="text-2xl font-semibold mb-8 text-center">Why choose us over typical PDF sites</h2>
+        <div className="card overflow-hidden">
+          <div className="grid grid-cols-3 text-sm font-medium bg-slate-50 dark:bg-slate-900 p-4 border-b">
+            <div>Feature</div>
+            <div className="text-center">FreePDF</div>
+            <div className="text-center text-slate-500">Others</div>
+          </div>
+          {[
+            ["No signup required", "✓", "✗"],
+            ["No watermarks", "✓", "✗"],
+            ["Files stay local", "✓", "✗"],
+            ["Unlimited use", "✓", "✗ Paid"],
+            ["No daily limits", "✓", "✗"],
+          ].map(([feat, us, them]) => (
+            <div key={feat} className="grid grid-cols-3 p-4 border-b last:border-0 text-sm">
+              <div>{feat}</div>
+              <div className="text-center text-emerald-600 font-medium">{us}</div>
+              <div className="text-center text-slate-500">{them}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section className="container-narrow py-16">
+        <h2 className="text-2xl font-semibold mb-8 text-center">How it works</h2>
+        <div className="grid md:grid-cols-3 gap-8 text-center">
+          <div>
+            <div className="h-12 w-12 rounded-full bg-brand-600 text-white flex items-center justify-center mx-auto mb-3 text-lg font-semibold">1</div>
+            <h3 className="font-medium mb-1">Upload</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Drag and drop your PDF. Nothing uploads.</p>
+          </div>
+          <div>
+            <div className="h-12 w-12 rounded-full bg-brand-600 text-white flex items-center justify-center mx-auto mb-3 text-lg font-semibold">2</div>
+            <h3 className="font-medium mb-1">Process</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Edit, merge, or convert instantly in browser.</p>
+          </div>
+          <div>
+            <div className="h-12 w-12 rounded-full bg-brand-600 text-white flex items-center justify-center mx-auto mb-3 text-lg font-semibold">3</div>
+            <h3 className="font-medium mb-1">Download</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Get your file. No tracking, no storage.</p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

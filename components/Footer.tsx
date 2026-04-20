@@ -31,9 +31,9 @@ export default function Footer() {
           <div>
             <div className="font-medium mb-3 text-sm">Company</div>
             <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
-              <li><a href="#" className="hover:text-brand-600">Privacy</a></li>
-              <li><a href="#" className="hover:text-brand-600">Terms</a></li>
-              <li><a href="#" className="hover:text-brand-600">Contact</a></li>
+              <li><Link href="/privacy" className="hover:text-brand-600">Privacy</Link></li>
+              <li><Link href="/faq" className="hover:text-brand-600">FAQ</Link></li>
+              <li><Link href="/contact" className="hover:text-brand-600">Contact</Link></li>
             </ul>
           </div>
         </div>

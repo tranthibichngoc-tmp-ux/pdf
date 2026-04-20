@@ -26,7 +26,7 @@ export default function Navbar() {
     { href: "/merge-pdf", label: "Merge" },
     { href: "/split-pdf", label: "Split" },
     { href: "/compress-pdf", label: "Compress" },
-    { href: "/pdf-to-word", label: "PDF to Word" },
+    { href: "/edit-pdf", label: "Edit" },
   ];
 
   return (
@@ -46,7 +46,7 @@ export default function Navbar() {
                 {t.label}
               </Link>
             ))}
-            <Link href="/#tools" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">All Tools</Link>
+            <Link href="/tools" className="text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white">All Tools</Link>
           </nav>
 
           <div className="flex items-center gap-2">
