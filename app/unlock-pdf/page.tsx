@@ -1,5 +1,96 @@
-import ToolPage from "@/components/ToolPage";
-export const metadata = { title: "Unlock PDF — FreePDF" };
-export default function Page() {
-  return <ToolPage title="Unlock PDF" description="Remove password from PDF (if you know it)." actionLabel="Unlock" options={<input type="password" placeholder="Current password" className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm" />} />;
+"use client";
+
+import { useState } from "react";
+import UploadZone from "@/components/UploadZone";
+import { Download, Loader2, CheckCircle2 } from "lucide-react";
+import { PDFDocument } from "pdf-lib";
+
+export default function UnlockPdf() {
+  const [files, setFiles] = useState<File[]>([]);
+  const [processing, setProcessing] = useState(false);
+  const [done, setDone] = useState(false);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
+  const [password, setPassword] = useState("");
+
+  const handleUnlock = async () => {
+    if (files.length === 0) return;
+    setProcessing(true);
+    setDone(false);
+    
+    try {
+      const file = files[0];
+      const bytes = await file.arrayBuffer();
+      
+      const pdfDoc = await PDFDocument.load(bytes, { 
+        ignoreEncryption: false,
+        ...(password ? { password } : {})
+      });
+      
+      // Save without encryption
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      setDownloadUrl(url);
+      setDone(true);
+    } catch (e: any) {
+      console.error(e);
+      if (e.message?.includes('password') || e.message?.includes('encrypt')) {
+        alert("Incorrect password or PDF is encrypted. Please enter the correct password.");
+      } else {
+        alert("Failed to unlock PDF. It may not be password-protected.");
+      }
+    }
+    setProcessing(false);
+  };
+
+  const handleDownload = () => {
+    if (!downloadUrl) return;
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = files[0].name.replace(/\.pdf$/i, '-unlocked.pdf');
+    a.click();
+  };
+
+  return (
+    <div className="container-narrow py-10">
+      <div className="max-w-3xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-semibold">Unlock PDF</h1>
+          <p className="mt-2 text-slate-600 dark:text-slate-300">Remove password from PDF (if you know it). All processing happens locally.</p>
+        </div>
+        <div className="card p-6 md:p-8">
+          <UploadZone accept=".pdf" multiple={false} onFiles={setFiles} />
+          <div className="mt-6">
+            <label className="text-sm font-medium">Current password</label>
+            <input 
+              type="password" 
+              placeholder="Enter PDF password" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm" 
+            />
+          </div>
+          <div className="mt-6 flex items-center gap-3">
+            <button onClick={handleUnlock} disabled={files.length === 0 || processing} className="btn-primary h-11 px-6">
+              {processing ? (<><Loader2 className="h-4 w-4 mr-2 animate-spin" />Unlocking...</>) : "Unlock"}
+            </button>
+            {done && <div className="flex items-center gap-2 text-emerald-600 text-sm"><CheckCircle2 className="h-4 w-4" />Ready</div>}
+          </div>
+          {done && downloadUrl && (
+            <div className="mt-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">PDF unlocked</p>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-300">Password removed</p>
+                </div>
+                <button className="btn-secondary" onClick={handleDownload}>
+                  <Download className="h-4 w-4 mr-2" />Download
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }

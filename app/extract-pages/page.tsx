@@ -24,7 +24,7 @@ export default function ExtractPages() {
         if (n >= 1 && n <= total) pages.push(n - 1);
       }
     });
-    return [...new Set(pages)].sort((a, b) => a - b);
+    return Array.from(new Set(pages)).sort((a, b) => a - b);
   };
 
   const handleExtract = async () => {
@@ -44,7 +44,7 @@ export default function ExtractPages() {
       pages.forEach(p => newPdf.addPage(p));
       
       const pdfBytes = await newPdf.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       setOutputUrl(url);
       setDone(true);

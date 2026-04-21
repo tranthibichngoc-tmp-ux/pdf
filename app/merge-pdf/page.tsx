@@ -27,7 +27,7 @@ export default function MergePDF() {
       }
       
       const mergedBytes = await mergedPdf.save();
-      const blob = new Blob([mergedBytes], { type: "application/pdf" });
+      const blob = new Blob([mergedBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       setOutputUrl(url);
       setDone(true);

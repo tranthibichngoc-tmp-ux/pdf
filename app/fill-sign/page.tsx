@@ -84,7 +84,7 @@ export default function FillSign() {
       });
       
       const pdfBytes = await pdf.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       setOutputUrl(url);
       setDone(true);

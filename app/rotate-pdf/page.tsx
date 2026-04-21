@@ -21,7 +21,7 @@ export default function RotatePDF() {
         page.setRotation(degrees(angle));
       });
       const newBytes = await pdf.save();
-      const blob = new Blob([newBytes], { type: "application/pdf" });
+      const blob = new Blob([newBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       setOutput(URL.createObjectURL(blob));
     } catch (e) {
       alert("Failed to rotate");

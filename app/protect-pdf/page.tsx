@@ -21,7 +21,7 @@ export default function ProtectPDF() {
         useObjectStreams: true,
         // pdf-lib doesn't support encryption in browser easily, we'll simulate
       });
-      const blob = new Blob([newBytes], { type: "application/pdf" });
+      const blob = new Blob([newBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       setOutput(URL.createObjectURL(blob));
     } catch (e) {
       alert("Failed");

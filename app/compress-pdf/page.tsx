@@ -19,7 +19,7 @@ export default function CompressPDF() {
       const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
       // Re-save with default compression
       const compressedBytes = await pdf.save({ useObjectStreams: true });
-      const blob = new Blob([compressedBytes], { type: "application/pdf" });
+      const blob = new Blob([compressedBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       setOutput({
         url,

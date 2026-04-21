@@ -24,7 +24,7 @@ export default function DeletePages() {
         if (n >= 1 && n <= total) pages.push(n - 1);
       }
     });
-    return [...new Set(pages)].sort((a, b) => b - a);
+    return Array.from(new Set(pages)).sort((a, b) => b - a);
   };
 
   const handleDelete = async () => {
@@ -46,7 +46,7 @@ export default function DeletePages() {
       });
       
       const pdfBytes = await pdf.save();
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       setOutputUrl(url);
       setDone(true);

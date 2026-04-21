@@ -2,31 +2,34 @@
 
 import { useState } from "react";
 import UploadZone from "@/components/UploadZone";
-import { Download, Loader2, CheckCircle2 } from "lucide-react";
+import { Download, Loader2, CheckCircle2, Archive } from "lucide-react";
 
 export default function PdfToPng() {
   const [files, setFiles] = useState<File[]>([]);
   const [processing, setProcessing] = useState(false);
   const [done, setDone] = useState(false);
   const [outputUrls, setOutputUrls] = useState<string[]>([]);
+  const [blobs, setBlobs] = useState<Blob[]>([]);
 
   const handleConvert = async () => {
     if (files.length === 0) return;
     setProcessing(true);
     setDone(false);
     setOutputUrls([]);
+    setBlobs([]);
     
     try {
-      const pdfjsLib = await import('pdfjs-dist/build/pdf');
+      const pdfjsLib = await import('pdfjs-dist');
       // @ts-ignore
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@5.6.205/build/pdf.worker.min.mjs`;
       
       const file = files[0];
       const bytes = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
       const urls: string[] = [];
+      const newBlobs: Blob[] = [];
       
-      for (let i = 1; i <= Math.min(pdf.numPages, 10); i++) {
+      for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const viewport = page.getViewport({ scale: 2.0 });
         const canvas = document.createElement('canvas');
@@ -34,33 +37,20 @@ export default function PdfToPng() {
         canvas.width = viewport.width;
         canvas.height = viewport.height;
         
-        await page.render({ canvasContext: context, viewport }).promise;
+        await page.render({ canvasContext: context, viewport, canvas }).promise;
         
         const blob = await new Promise<Blob>(resolve => canvas.toBlob(b => resolve(b!), 'image/png'));
+        newBlobs.push(blob);
         const url = URL.createObjectURL(blob);
         urls.push(url);
       }
       
+      setBlobs(newBlobs);
       setOutputUrls(urls);
       setDone(true);
     } catch (e) {
       console.error(e);
-      alert("Failed to convert. Install pdfjs-dist for full functionality");
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = 800;
-        canvas.height = 1000;
-        const ctx = canvas.getContext('2d')!;
-        ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, 800, 1000);
-        ctx.fillStyle = 'black';
-        ctx.font = '24px sans-serif';
-        ctx.fillText('PDF to PNG conversion', 50, 100);
-        const blob = await new Promise<Blob>(resolve => canvas.toBlob(b => resolve(b!), 'image/png'));
-        const url = URL.createObjectURL(blob);
-        setOutputUrls([url]);
-        setDone(true);
-      } catch {}
+      alert("Failed to convert PDF. Please try another file.");
     }
     setProcessing(false);
   };
@@ -70,6 +60,22 @@ export default function PdfToPng() {
     a.href = url;
     a.download = `page-${index + 1}.png`;
     a.click();
+  };
+
+  const handleDownloadAll = async () => {
+    if (blobs.length === 0) return;
+    const JSZip = (await import('jszip')).default;
+    const zip = new JSZip();
+    blobs.forEach((blob, i) => {
+      zip.file(`page-${i + 1}.png`, blob);
+    });
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(zipBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pdf-pages.zip';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -91,6 +97,11 @@ export default function PdfToPng() {
             <div className="mt-6 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900">
               <p className="font-medium mb-3">Your images are ready ({outputUrls.length} pages)</p>
               <div className="space-y-2">
+                {outputUrls.length > 1 && (
+                  <button className="btn-primary w-full justify-start" onClick={handleDownloadAll}>
+                    <Archive className="h-4 w-4 mr-2" />Download all as ZIP
+                  </button>
+                )}
                 {outputUrls.map((url, i) => (
                   <button key={i} className="btn-secondary w-full justify-start" onClick={() => handleDownload(url, i)}>
                     <Download className="h-4 w-4 mr-2" />Download page {i + 1}.png
