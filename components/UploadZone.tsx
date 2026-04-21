@@ -19,9 +19,10 @@ export default function UploadZone({
   const handleFiles = useCallback((fileList: FileList | null) => {
     if (!fileList) return;
     const arr = Array.from(fileList);
-    setFiles(multiple ? arr : arr.slice(0,1));
-    onFiles?.(arr);
-  }, [multiple, onFiles]);
+    const newFiles = multiple ? [...files, ...arr] : arr.slice(0,1);
+    setFiles(newFiles);
+    onFiles?.(newFiles);
+  }, [multiple, onFiles, files]);
 
   return (
     <div className="w-full">
@@ -62,7 +63,11 @@ export default function UploadZone({
                 <p className="text-sm font-medium truncate">{f.name}</p>
                 <p className="text-xs text-slate-500">{(f.size/1024/1024).toFixed(2)} MB</p>
               </div>
-              <button onClick={() => setFiles(files.filter((_, idx) => idx !== i))} className="btn-ghost h-8 w-8 p-0">
+              <button onClick={() => {
+                const newFiles = files.filter((_, idx) => idx !== i);
+                setFiles(newFiles);
+                onFiles?.(newFiles);
+              }} className="btn-ghost h-8 w-8 p-0">
                 <X className="h-4 w-4" />
               </button>
             </div>
